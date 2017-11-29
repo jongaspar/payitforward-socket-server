@@ -1,24 +1,20 @@
-"use strict"
+"use strict";
 
-require('dotenv').config();
+require("dotenv").config();
 
 const app = require("express")();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const PORT = 3002;
 
-
-
 //
 // JWT Validation
 //
 
-var jwt = require('jwt-simple');
+var jwt = require("jwt-simple");
 var secret = process.env.JWT_SECRET;
 
 // console.log(decoded);
-
-
 
 //
 // Helpers
@@ -27,8 +23,6 @@ var secret = process.env.JWT_SECRET;
 function decode(token) {
   return jwt.decode(token, secret);
 }
-
-
 
 //
 // Sockets
@@ -42,13 +36,15 @@ io.use((socket, next) => {
   const otherUserId = Number(socket.handshake.query.otherUserId);
   const contractId = Number(socket.handshake.query.contractId);
 
-  if (!rooms[contractId]) { // If no room yet
+  if (!rooms[contractId]) {
+    // If no room yet
     rooms[contractId] = [userId, otherUserId];
     return next();
-  } else if (rooms[contractId].indexOf(userId) > -1) { // Returns true if this user is part of the contract/room
+  } else if (rooms[contractId].indexOf(userId) > -1) {
+    // Returns true if this user is part of the contract/room
     return next();
   } else {
-    return next(new Error('authentication error'));
+    return next(new Error("authentication error"));
   }
 });
 
@@ -61,7 +57,6 @@ io.on("connection", function(socket) {
     if (!message.content) return; // prevents blank messages
     socket.nsp.in(contractId).emit("message", message);
   });
-
 });
 
 http.listen(PORT, function() {
