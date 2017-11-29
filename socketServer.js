@@ -61,6 +61,10 @@ io.on("connection", function(socket) {
     if (!message.content) return; // prevents blank messages
     socket.nsp.in(contractId).emit("message", message);
   });
+
+  socket.on("transaction-indicator", function(data) {
+    socket.emit("transaction-indicator", data)
+  })
 });
 
 http.listen(PORT, function() {
