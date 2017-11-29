@@ -41,7 +41,6 @@ io.use((socket, next) => {
   const userId = decode(socket.handshake.query.token);
   const otherUserId = Number(socket.handshake.query.otherUserId);
   const contractId = Number(socket.handshake.query.contractId);
-  console.log(`${userId} vs ${otherUserId} -- (Contract ${contractId})`);
 
   if (!rooms[contractId]) { // If no room yet
     rooms[contractId] = [userId, otherUserId];
@@ -55,13 +54,12 @@ io.use((socket, next) => {
 
 io.on("connection", function(socket) {
   const contractId = socket.handshake.query.contractId;
-  console.log('CONNECTED: contract#', contractId);
 
   socket.join(contractId);
 
   socket.on("message", function(message) {
-    console.log("I received a message", message, "contract:", contractId);
-    socket.to(contractId).emit("message", message);
+    if (!message.content) return; // prevents blank messages
+    socket.nsp.in(contractId).emit("message", message);
   });
 });
 
