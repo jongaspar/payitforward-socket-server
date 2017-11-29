@@ -13,12 +13,20 @@ const PORT = 3002;
 // JWT Validation
 //
 
-var jwt = require('jwt-simple');
-var secret = process.env.JWT_SECRET;
-var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.MTY2.u5u4hkvjrDZPcxPXZzFP9i5eRuIoSFv3Z5ofnBucBWo'
-var decoded = jwt.decode(token, secret);
+// var jwt = require('jwt-simple');
+// var secret = process.env.JWT_SECRET;
 
 // console.log(decoded);
+
+
+
+//
+// Helpers
+//
+
+// function decode(token) {
+//   return jwt.decode(token, secret);
+// }
 
 
 
@@ -26,12 +34,34 @@ var decoded = jwt.decode(token, secret);
 // Sockets
 //
 
+// const rooms = {};
+
+// io.use((socket, next) => {
+//   const userId = decode(socket.handshake.query.token);
+//   const otherUserId = socket.handshake.query.otherUserId;
+//   const contractId = socket.handshake.query.contractId;
+//   console.log(`${userId} vs ${otherUserId} -- (Contract ${contractId})`);
+
+//   if (!rooms[contractId]) { // If no room yet
+//     rooms[contractId] = [userId, otherUserId];
+//   } else if (rooms[contractId].indexOf(userId) > -1) { // Returns true if this user is part of the contract/room
+//     console.log("ROOMS:",rooms);
+
+//     return next();
+//   } else {
+//     return next(new Error('authentication error'));
+//   }
+// });
+
 io.on("connection", function(socket) {
-  console.log("a user connected");
+  const contractId = socket.handshake.query.contractId;
+  console.log('CONNECTED: contract#', contractId);
+
+  socket.join(contractId);
 
   socket.on("message", function(message) {
-    console.log("I received a message", message);
-    socket.broadcast.emit("message", message);
+    console.log("I received a message", message, "contract:", contractId);
+    socket.to(contractId).emit("message", message);
   });
 });
 
