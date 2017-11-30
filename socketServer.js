@@ -11,8 +11,8 @@ const PORT = 3002;
 // JWT Validation
 //
 
-var jwt = require("jwt-simple");
-var secret = process.env.JWT_SECRET;
+// var jwt = require("jwt-simple");
+// var secret = process.env.JWT_SECRET;
 
 // console.log(decoded);
 
@@ -20,36 +20,37 @@ var secret = process.env.JWT_SECRET;
 // Helpers
 //
 
-function decode(token) {
-  return jwt.decode(token, secret);
-}
+// function decode(token) {
+//   return jwt.decode(token, secret);
+// }
 
 //
 // Sockets
 //
 
-const rooms = {};
+// const rooms = {};
 
-// Client verification:
-io.use((socket, next) => {
-  const userId = decode(socket.handshake.query.token);
-  const otherUserId = Number(socket.handshake.query.otherUserId);
-  const contractId = Number(socket.handshake.query.contractId);
+// // Client verification:
+// io.use((socket, next) => {
+//   const userId = decode(socket.handshake.query.token);
+//   const otherUserId = Number(socket.handshake.query.otherUserId);
+//   const contractId = Number(socket.handshake.query.contractId);
 
-  if (!rooms[contractId]) {
-    // If no room yet
-    rooms[contractId] = [userId, otherUserId];
-    return next();
-  } else if (rooms[contractId].indexOf(userId) > -1) {
-    // Returns true if this user is part of the contract/room
-    return next();
-  } else {
-    return next(new Error("authentication error"));
-  }
-});
+//   if (!rooms[contractId]) {
+//     // If no room yet
+//     rooms[contractId] = [userId, otherUserId];
+//     return next();
+//   } else if (rooms[contractId].indexOf(userId) > -1) {
+//     // Returns true if this user is part of the contract/room
+//     return next();
+//   } else {
+//     return next(new Error("authentication error"));
+//   }
+// });
 
 io.on("connection", function(socket) {
-  const contractId = socket.handshake.query.contractId;
+  const contractId = Number(socket.handshake.query.contractId);
+  console.log('A user connected');
 
   socket.join(contractId);
 
